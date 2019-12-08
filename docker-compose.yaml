@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+    mongo-db-container:
+        image: mongo:3.4.2
+        container_name: mongodb
+        restart: always
+        environment:
+            # Provide your credentials here
+            # TESTING connection:
+            #     mongo --username admin_rinf --password --authenticationDatabase admin --host <IP/DNS> --port 27017
+            - MONGO_INITDB_ROOT_USERNAME=admin_rinf
+            - MONGO_INITDB_ROOT_PASSWORD=somethingsecure1234
+        volumes:
+            # Additional user accounts specific per DB or with different roles can use the following entry point
+            - "$PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/"
+        # no <--auth> is needed here as presence of username and password add this option automatically
+        command: mongod
+        networks:
+            - webappnetwork
+    react_app:
+        build:
+            context: .
+            dockerfile: "./react_app"
+        image: react_app
+        restart: always
+        volumes:
+            - ./client:/app/rinf_demo_app/client
+        ports:
+            - "3000:3000"
+        depends_on:
+            - mongo-db-container
+        networks:
+            - webappnetwork
+networks:
+    webappnetwork:
+        driver: bridge

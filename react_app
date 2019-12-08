@@ -1,0 +1,22 @@
+# Base image
+FROM node:12.2.0-alpine
+
+# For debugging purpose0
+RUN apk add busybox-extras
+
+# Set working directory
+RUN mkdir /app
+WORKDIR /app
+
+# Get the APP
+RUN npm install --silent
+RUN npm install react-scripts@3.0.1 -g --silent
+RUN npx create-react-app rinf_demo_app
+
+WORKDIR /app/rinf_demo_app
+
+# Make port 3000 available to the world outside this container
+EXPOSE 3000
+
+# Run the app when the container launches
+CMD ["npm", "start"]
